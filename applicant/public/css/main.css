@@ -6,3 +6,7 @@
 .form-error {
    margin-bottom: 1rem;
 }
+
+video {
+   width: 100%;
+}
