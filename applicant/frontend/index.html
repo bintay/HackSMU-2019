@@ -23,18 +23,31 @@
          <div class='container'>
             <div class='box' v-for='sec in applicantInfo'>
                <p class='title'>{{ sec.heading }}</p>
-               <div class='field is-horizontal' v-for='input in sec.questions'>
-                  <div class="field-label is-normal">
-                     <label class='label' :for='input[0].toLowerCase().replace(/\W/g, "-")'>{{ input[0] }}</label>
+               <div v-for='input in sec.questions'>
+                  <div class='field is-horizontal'>
+                     <div class='field-label is-normal'>
+                        <label class='label' :for='input[0].toLowerCase().replace(/\W/g, "-")'>{{ input[0] }}</label>
+                     </div>
+                     <div class='field-body'>
+                        <div class='field'>
+                           <p class='control'>
+                              <input type='text' class='input' :name='input[0].toLowerCase().replace(/\W/g, "-")' value='' :placeholder='input[1]' @keyup='validateKey' @blur='validateBlur' />
+                           </p>
+                        </div>
+                     </div>
                   </div>
-                  <div class="field-body">
-                     <div class="field">
-                        <p class="control">
-                           <input type='text' class='input' :name='input[0].toLowerCase().replace(/\W/g, "-")' value='' :placeholder='input[1]' />
-                        </p>
+                  <div class='field is-horizontal'>
+                     <div class='field-label is-normal'></div>
+                     <div class='field-body'>
+                        <p class="help is-danger form-error" v-if='input[0] == "Email" && invalidEmail'>This email is invalid<br></p>
+                        <p class="help is-danger form-error" v-if='input[0] != "Email" && blank[input[0].toLowerCase().replace(/\W/g, "-")]'>Don't leave anything blank!</p>
                      </div>
                   </div>
                </div>
+
+            </div>
+            <div class='has-text-centered'>
+               <a class='button is-primary' @click='startVideos'>Let's Interview!</a>
             </div>
          </div>
       </section>
@@ -56,13 +69,15 @@
          </div>`
       });
 
-      var app = new Vue({
+      const app = new Vue({
          el: '#app',
          data: {
             landingPageActive: true,
             applicantInfoActive: false,
             videoQuestionsActive: false,
             questionNumber: 0,
+            invalidEmail: false,
+            blank: {'phone': false, 'full-name': false, 'email': false, 'address': false, 'postal-code': false, 'city': false, 'country': false, 'state': false},
             questions: [{
                text: 'What can you offer us that someone else cannot?',
                type: 'video'
@@ -90,12 +105,100 @@
             startProcess: function () {
                this.landingPageActive = false;
                this.applicantInfoActive = true;
+            },
+            startVideos: function () {
+               let valid = true;
+
+               for (let box of this.applicantInfo) {
+                  for (let question of box.questions) {
+                     let element = document.querySelector(`input[name=${question[0].toLowerCase().replace(/\W/g, '-')}]`);
+                     let name = element.name;
+                     
+                     if (name == 'email') {
+                        let validEmail = validateEmail(element.value);
+                        if (!validEmail) {
+                           element.classList.add('is-danger');
+                           this.invalidEmail = true;
+                           valid = false;
+                        } else {
+                           element.classList.remove('is-danger');
+                           this.invalidEmail = false;
+                        }
+                     }
+
+                     if (name != 'email') {
+                        if (element.value.length == 0) {
+                           this.blank[element.name] = true;
+                           Vue.set(this.blank, element.name, true);
+                           element.classList.add('is-danger');
+                           valid = false;
+                        } else {
+                           this.blank[element.name] = false;
+                           Vue.set(this.blank, element.name, false);
+                           element.classList.remove('is-danger');
+                        }
+                     }
+                  }
+               }
+
+               if (valid) {
+                  this.applicantInfoActive = false;
+                  this.videoQuestionsActive = true;
+               }
+            },
+            validateBlur: function (e) {
+               let element = e.target
+               let name = element.name;
+               
+               if (name == 'email') {
+                  let validEmail = validateEmail(element.value);
+                  if (!validEmail) {
+                     element.classList.add('is-danger');
+                     this.invalidEmail = true;
+                  } else {
+                     element.classList.remove('is-danger');
+                     this.invalidEmail = false;
+                  }
+               }
+
+               if (name != 'email') {
+                  if (element.value.length == 0) {
+                     this.blank[element.name] = true;
+                     Vue.set(this.blank, element.name, true);
+                     element.classList.add('is-danger');
+                  } else {
+                     this.blank[element.name] = false;
+                     Vue.set(this.blank, element.name, false);
+                     element.classList.remove('is-danger');
+                  }
+               }
+            },
+            validateKey: function (e) {
+               let element = e.target
+               let name = element.name;
+
+               if (name == 'email') {
+                  element.classList.remove('is-danger');
+                  this.invalidEmail = false;
+               }
+
+               if (name != 'email') {
+                  if (element.value.length != 0) {
+                     this.blank[element.name] = false;
+                     Vue.set(this.blank, element.name, false);
+                     element.classList.remove('is-danger');
+                  }
+               }
             }
          },
          created: function () {
 
          }
       });
+
+      function validateEmail (email) {
+         return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email);
+      }
    </script>
 </body>
 </html>
