@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>StateFarm Application</title>
+   <link type='text/css' rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css' />
+   <link type='text/css' rel='stylesheet' href='/public/css/main.css' />
+   <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+<body>
+   <section id='app'>
+      <section class='hero-body'>
+         <div class='container has-text-centered'>
+            <h1 class='title'>StateFarm Application</h1>
+            <h2 class='subtitle'>Like a good neigbor</h2>
+         </div>
+      </section>
+      <section class='section' v-if='landingPageActive'>
+         <div class='container has-text-centered'>
+            <a class='button is-primary' @click='startProcess'>Begin Application Process</a>
+         </div>
+      </section>
+      <section class='section' v-if='applicantInfoActive'>
+         <div class='container'>
+            <div class='box' v-for='sec in applicantInfo'>
+               <p class='title'>{{ sec.heading }}</p>
+               <div class='field is-horizontal' v-for='input in sec.questions'>
+                  <div class="field-label is-normal">
+                     <label class='label' :for='input[0].toLowerCase().replace(/\W/g, "-")'>{{ input[0] }}</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <p class="control">
+                           <input type='text' class='input' :name='input[0].toLowerCase().replace(/\W/g, "-")' value='' :placeholder='input[1]' />
+                        </p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      <section class='section' v-if='videoQuestionsActive'>
+         <div class='container'>
+            <question-video :question='questions[questionNumber]'>
+               
+            </question-video>
+         </div>
+      </section>
+   </section>
+
+   <script>
+      Vue.component('question-video', {
+         props: ['question'],
+         template: `
+         <div class='box'>
+            <p> {{ question.text }}</p>
+         </div>`
+      });
+
+      var app = new Vue({
+         el: '#app',
+         data: {
+            landingPageActive: true,
+            applicantInfoActive: false,
+            videoQuestionsActive: false,
+            questionNumber: 0,
+            questions: [{
+               text: 'What can you offer us that someone else cannot?',
+               type: 'video'
+            }],
+            applicantInfo: [{
+               heading: 'Basic Information',
+               questions: [
+                  ['Full Name', 'Ben Taylor'],
+                  ['Email', 'ben.taylor@example.com'],
+                  ['Phone', '(940) 555-1234']
+               ]
+            },
+            {
+               heading: 'Address',
+               questions: [
+                  ['Address', '6425 Boaz Lane'],
+                  ['Postal Code', '75205'],
+                  ['City', 'Dallas'],
+                  ['Country', 'United States'],
+                  ['State', 'Texas']
+               ]
+            }]
+         },
+         methods: {
+            startProcess: function () {
+               this.landingPageActive = false;
+               this.applicantInfoActive = true;
+            }
+         },
+         created: function () {
+
+         }
+      });
+   </script>
+</body>
+</html>
