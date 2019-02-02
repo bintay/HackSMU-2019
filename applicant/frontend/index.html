@@ -3,6 +3,7 @@
 <head>
    <title>StateFarm Application</title>
    <link type='text/css' rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css' />
+   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/solid.css' integrity='sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G' crossorigin='anonymous' />
    <link type='text/css' rel='stylesheet' href='/public/css/main.css' />
    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
 </head>
@@ -26,7 +27,7 @@
                <div v-for='input in sec.questions'>
                   <div class='field is-horizontal'>
                      <div class='field-label is-normal'>
-                        <label class='label' :for='input[0].toLowerCase().replace(/\W/g, "-")'>{{ input[0] }}</label>
+                        <label class='label' :for='input[0].toLowerCase().replace(/\W/g, '-')'>{{ input[0] }}</label>
                      </div>
                      <div class='field-body'>
                         <div class='field'>
@@ -39,8 +40,8 @@
                   <div class='field is-horizontal'>
                      <div class='field-label is-normal'></div>
                      <div class='field-body'>
-                        <p class="help is-danger form-error" v-if='input[0] == "Email" && invalidEmail'>This email is invalid<br></p>
-                        <p class="help is-danger form-error" v-if='input[0] != "Email" && blank[input[0].toLowerCase().replace(/\W/g, "-")]'>Don't leave anything blank!</p>
+                        <p class='help is-danger form-error' v-if='input[0] == "Email" && invalidEmail'>This email is invalid<br></p>
+                        <p class='help is-danger form-error' v-if='input[0] != "Email" && blank[input[0].toLowerCase().replace(/\W/g, "-")]'>Don't leave anything blank!</p>
                      </div>
                   </div>
                </div>
@@ -53,30 +54,40 @@
       </section>
       <section class='section' v-if='videoQuestionsActive'>
          <div class='container'>
-            <question-video :question='questions[questionNumber]'>
+            <question-video :question='questions[questionNumber]' :record='record'>
                
             </question-video>
+            <video id='webcam' class='box' autoplay='true'></video>
          </div>
       </section>
    </section>
 
+   <script src='https://cdn.WebRTC-Experiment.com/RecordRTC.js'></script>
    <script>
       Vue.component('question-video', {
-         props: ['question'],
+         props: ['question', 'record'],
          template: `
          <div class='box'>
-            <p> {{ question.text }}</p>
+            <p class='title'> {{ question.text }}</p>
+            <p>Take some time to collect your thoughts. <br><br> Make sure we have permission to use the camera and microphone. <br><br> Click record when you're ready.</p>
+            <br>
+            <br>
+            <a class='button is-danger is-fullwidth' @click='record'> Record</a>
          </div>`
       });
+
+      let recorder;
+      let recording = false;
 
       const app = new Vue({
          el: '#app',
          data: {
-            landingPageActive: true,
+            landingPageActive: false,
             applicantInfoActive: false,
-            videoQuestionsActive: false,
+            videoQuestionsActive: true,
             questionNumber: 0,
             invalidEmail: false,
+            recording: false,
             blank: {'phone': false, 'full-name': false, 'email': false, 'address': false, 'postal-code': false, 'city': false, 'country': false, 'state': false},
             questions: [{
                text: 'What can you offer us that someone else cannot?',
@@ -144,6 +155,19 @@
                if (valid) {
                   this.applicantInfoActive = false;
                   this.videoQuestionsActive = true;
+                  
+                  // preview webcam
+                  let video = document.querySelector('#webcam');
+ 
+                  if (navigator.mediaDevices.getUserMedia) {       
+                      navigator.mediaDevices.getUserMedia({video: true})
+                    .then(function(stream) {
+                      video.srcObject = stream;
+                    })
+                    .catch(function(err0r) {
+                      console.log('Something went wrong!');
+                    });
+                  }
                }
             },
             validateBlur: function (e) {
@@ -189,6 +213,26 @@
                      element.classList.remove('is-danger');
                   }
                }
+            },
+            record: function (e) {
+               if (!recording) {
+                  navigator.mediaDevices.getUserMedia({
+                      video: true,
+                      audio: true
+                  }).then(async function(stream) {
+                     recording = true;
+                     recorder = RecordRTC(stream, {
+                        type: 'video'
+                     });
+                     recorder.startRecording();
+                  });
+               } else {
+                  recorder.stopRecording(function() {
+                     recording = false;
+                     let blob = recorder.getBlob();
+                     invokeSaveAsDialog(blob);
+                  });
+               }
             }
          },
          created: function () {
@@ -197,7 +241,7 @@
       });
 
       function validateEmail (email) {
-         return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email);
+         return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|'(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*')@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email);
       }
    </script>
 </body>
