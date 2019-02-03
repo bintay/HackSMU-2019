@@ -83,7 +83,7 @@
          <div class='container'>
             <p class='title'>Programming Challenge</p>
             <p class='subtitle'>Description</p>
-            <p>Jake, an emplyee at StateFarm, really likes wearing khakis. He is going on a business trip later this month, and wants to bring the best wardrobe he can. Unfortunetly, because Jake has 78321863 pairs of kahkis, he cannot fit all of them in his bag. Some khakis are worth more than others, and some are bigger than others. Given an array containing the weight information and value of each of Jake's khakis, what is the most valuable wardrobe Jake can bring? Note: If Jake can only take part of a pair of khakis, he would have to rip it, giving it negative worth, so he avoids taking partial khakis.</p>
+            <p>Jake, an employee at StateFarm, really likes wearing khakis. He is going on a business trip later this month, and wants to bring the best wardrobe he can. Unfortunately, because Jake from StateFarm has 78321863 pairs of khakis, he cannot fit all of them in his bag. Some khakis are worth more than others, and some are bigger than others. Given an array containing the weight information and value of each of Jake's khakis, what is the most valuable wardrobe Jake can bring? Note: If Jake can only take part of a pair of khakis, he would have to rip it, giving it negative worth, so he avoids taking partial khakis.</p>
             <br>
             <p class='subtitle'>Inputs</p>
             <p>
@@ -123,7 +123,7 @@
          props: ['question', 'record'],
          template: `
          <div class='box'>
-            <p class='title'> {{ question.text }}</p>
+            <p class='title'> {{ question.number }}. {{ question.text }}</p>
             <p>Take some time to collect your thoughts. <br> Make sure we have permission to use the camera and microphone. <br>Click record when you're ready.</p>
             <br>
             <a class='button is-danger is-fullwidth' @click='record'><i class='fas fa-video'></i>&nbsp;&nbsp;Record</a>
@@ -156,11 +156,18 @@
             blank: {'phone': false, 'full-name': false, 'email': false, 'address': false, 'postal-code': false, 'city': false, 'country': false, 'state': false},
             questions: [{
                text: 'What can you offer us that someone else cannot?',
-               type: 'video'
+               type: 'video',
+               number: 1
             },
             {
                text: 'What gets you up in the morning?',
-               type: 'video'
+               type: 'video',
+               number: 2
+            },
+            {
+               text: 'Tell me about a time when you disagreed with your boss.',
+               type: 'video',
+               number: 3
             }],
             applicantInfo: [{
                heading: 'Basic Information',
@@ -368,19 +375,25 @@
                   [[[135, 70], [139, 73], [149, 77], [150, 80], [156,82], [163,87], [173,90], [184,94], [192,98], [201,106], [210,110], [214,113], [221,115], [229,118], [240,120]], 750, 1458]
                ];
                let testCasesPass = 0;
-               eval(code);
-               if (!helpJake) {
-                  this.codeError = 'Error: Method `helpJake` not found.';
-               } else {
+               try {
+                  eval(code);
+               } catch (e) {
+                  this.codeError = "Failed to run code. \n" + e;
+               }
+               if (this.codeError == '') {
                   let vueThis = this;
                   vueThis.codeLoading = true;
                   setTimeout(() => {
                      for (let i = 0; i < testCases.length; ++i) {
-                        if (helpJake(testCases[i][0], testCases[i][1]) != testCases[i][2]) {
-                           vueThis.codeError += `Test case ${i + 1} failed: Incorrect output.\n`;
-                        } else {
-                           vueThis.codeError += `Test case ${i + 1} passed\n`;
-                           ++testCasesPass;
+                        try {               
+                           if (helpJake(testCases[i][0], testCases[i][1]) != testCases[i][2]) {
+                              vueThis.codeError += `Test case ${i + 1} failed: Incorrect output.\n`;
+                           } else {
+                              vueThis.codeError += `Test case ${i + 1} passed\n`;
+                              ++testCasesPass;
+                           }
+                        } catch (e) {
+                           vueThis.codeError += `Test case ${i + 1} failed: Run time error\n${e}\n\n`
                         }
                      }
 
