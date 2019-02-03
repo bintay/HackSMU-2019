@@ -49,7 +49,6 @@
                      </div>
                   </div>
                </div>
-
             </div>
             <div class='has-text-centered'>
                <a class='button is-primary' @click='startVideos'>Let's Interview!</a>
@@ -113,7 +112,9 @@
       <section class='section' v-if='successActive'>
          <div class='container has-text-centered'>
             <p class='title'>Awesome! Jake is extremely grateful for your help. Now he knows exactly which khakis to bring.</p>
-            <a class='button is-primary' @click='submitApplication'>Submit my application!</a>
+            <a class='button is-primary' @click='submitApplication' v-if='!applicationSubmitted && !applicationLoading'>Submit my application!</a>
+            <a class='button is-primary is-loading' v-if='applicationLoading'>Loading</a>
+            <a class='button is-primary' v-if='applicationSubmitted && !applicationLoading'>Application Submitted</a>
          </div>
       </section>
    </section>
@@ -164,6 +165,8 @@
             codeStartTime: 0,
             timeTaken: 0,
             showCodeSubmit: true,
+            applicationLoading: false,
+            applicationSubmitted: false,
             blank: {'phone': false, 'full-name': false, 'email': false, 'address': false, 'postal-code': false, 'city': false, 'country': false, 'state': false},
             questions: [{
                text: 'What can you offer us that someone else cannot? Why do you want to bring these skills to StateFarm?',
@@ -439,7 +442,17 @@
                information.dateString = information.date.toDateString();
                information.dateISO = information.date.toISOString();
                information.dateNice = information.date.toLocaleString();
+               this.applicationSubmitted = true;
+               this.applicationLoading = true;
+               let vueThis = this;
+               information.video_url1 = 'http://localhost:12345/public/uploads/' + information.responses[0];
+               information.video_url2 = 'http://localhost:12345/public/uploads/' + information.responses[1];
+               information.video_url3 = 'http://localhost:12345/public/uploads/' + information.responses[2];
                console.log(information);
+               $.post('http://3.80.8.209:3000/applicants', information).done(function (data) {
+                  console.log(data);
+                  vueThis.applicationLoading = false;
+               });
             }
          },
          created: function () {

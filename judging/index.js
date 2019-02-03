@@ -22,6 +22,7 @@ app.post('/pdf', function (req, res) {
    let filename = uuid();
    fs.readFile('latex/template.tex', (err, data) => {
       if (err) console.log(err);
+      let code_time = zero(Math.floor(req.body.applicant.code_time / 60 / 60)) + ':' + zero(Math.floor(req.body.applicant.code_time / 60 % 60)) + ':' + zero(Math.floor(req.body.applicant.code_time % 60 % 60));
       data = data.toString().replace('{NAME}', req.body.applicant.name)
                  .replace('{ADDRESS}', req.body.applicant.address)
                  .replace('{CITY}', req.body.applicant.city)
@@ -38,7 +39,7 @@ app.post('/pdf', function (req, res) {
                  .replace('{RATING3}', req.body.applicant.video_rating3)
                  .replace('{COMMENT4}', req.body.applicant.code_comments)
                  .replace('{RATING4}', req.body.applicant.code_rating)
-                 .replace('{TIME}', req.body.applicant.code_time)
+                 .replace('{TIME}', code_time)
                  .replace('{FLAGGED}', req.body.applicant.flagged ? 'Yes' : 'No')
       console.log('read');
       fs.writeFile(`public/pdf/${filename}.tex`, data, function (err) {
@@ -97,3 +98,8 @@ state.farm.dev.recruiting@gmail.com
 app.listen(port, function () {
    console.log(`Listening on port ${port}`);
 });
+
+function zero (x) {
+  if (x < 10) x = '0' + x;
+  return '' + x;
+}
