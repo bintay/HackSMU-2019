@@ -43,4 +43,4 @@ It would also be interesting to experiment with a larger amount of data to see t
 
 ## Built With
 
-NodeJS, ExpressJS, MongoDB, VueJS, LaTeX, nodemailer, RecordRTC, jQuery, Bulma, Font Awesome, CodeMirror, JavaScript, ES6, SASS, CSS, HTML
+NodeJS, ExpressJS, MongoDB, VueJS, LaTeX, nodemailer, RecordRTC, jQuery, Bulma, Font Awesome, CodeMirror, JavaScript, ES6, SASS, CSS, HTML, Python, Pandas, NumPy, Bukeh
