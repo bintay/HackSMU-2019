@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <title>StateFarm Application</title>
+   <title>StateFarm Review</title>
    <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/bulma/mybulma.css' />
    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.1/css/all.css' integrity='sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr' crossorigin='anonymous'>
    <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/codemirror/lib/codemirror.css' />
    <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/codemirror/monokai.css' />
    <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/css/main.css' />
+   <link rel="shortcut icon" href="public/favicon.png"> 
    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
 </head>
 <body>
@@ -15,7 +16,7 @@
          <div class='container has-text-centered'>
             <img class='big-image' src='http://localhost:3000/public/images/state_farm_logo.svg' />
             <!-- <h1 class='title'>StateFarm Application</h1> -->
-            <h2 class='subtitle'>Developer Applications Judging</h2>
+            <h2 class='subtitle'>Developer Applications Review</h2>
          </div>
       </section>
       <section class='section loading' v-if='listActive && !loaded'>
@@ -28,7 +29,7 @@
                   <th>Name</th>
                   <th>Flagged as Hire</th>
                   <th>Time for Code Challenge</th>
-                  <th>Judged</th>
+                  <th>Reviewed</th>
                </thead>
                <tbody>
                      <tr v-for='applicant in applicants.sort(applicantsSorting)' @click='judgeApplicant(applicant)' class='applicantListing'>
@@ -112,7 +113,11 @@
             <star-rating :rating='currentApplicant.code_rating' active-color='#DA3831' @rating-selected='setRatingC'></star-rating>
          </div>
          <a class='button is-primary is-fullwidth' @click='generateReport' v-if='!pdfLoading'>Generate PDF Report</a>
-         <a class='button is-primary is-fullwidth is-loading' @click='generateReport' v-if='pdfLoading'>Loading</a>
+         <a class='button is-primary is-fullwidth is-loading' v-if='pdfLoading'>Loading</a>
+         <br>
+         <a class='button is-primary is-fullwidth' @click='sendInvite' v-if='!emailLoading && !sentEmail'>Send Interview Invite</a>
+         <a class='button is-primary is-fullwidth is-loading' v-if='emailLoading && !sentEmail'>Loading</a>
+         <a class='button is-primary is-fullwidth' v-if='sentEmail'>Invitation Sent</a>
          <br>
          <a class='button is-primary is-fullwidth' @click='backToList'>Save Application Review</a>
       </section>
@@ -142,6 +147,8 @@
             listActive: true,
             judgeActive: false,
             pdfLoading: false,
+            emailLoading: false,
+            sentEmail: false,
             currentApplicant: {
                name: '',
                email: '',
@@ -214,6 +221,17 @@
                   vueThis.pdfLoading = false;
                   window.open(`http://localhost:3001${data.file}`, '_blank');
                });
+            },
+            sendInvite: function () {
+               this.emailLoading = true;
+               let vueThis = this;
+               $.post('http://localhost:3001/invite', {
+                  applicant: this.currentApplicant
+               }).done(function (data) {
+                  data = JSON.parse(data);
+                  vueThis.emailLoading = false;
+                  vueThis.sendInvite = true;
+               });
             }
          },
          created: function () {
@@ -246,7 +264,7 @@
                },
                {
                   name: 'Ben Taylor',
-                  email: 'ben@example.com',
+                  email: 'bentaylor@bentaylor.me',
                   phone: '(555) 321-7638',
                   address: '312 Address Drive',
                   zip: '89133',

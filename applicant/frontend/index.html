@@ -7,6 +7,7 @@
    <link type='text/css' rel='stylesheet' href='/public/codemirror/lib/codemirror.css' />
    <link type='text/css' rel='stylesheet' href='/public/codemirror/monokai.css' />
    <link type='text/css' rel='stylesheet' href='/public/css/main.css' />
+   <link rel="shortcut icon" href="http://localhost:3001/public/favicon.png"> 
    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
 </head>
 <body>
@@ -434,6 +435,10 @@
                this.successActive = true;
             },
             submitApplication: function () {
+               information.date = new Date();
+               information.dateString = information.date.toDateString();
+               information.dateISO = information.date.toISOString();
+               information.dateNice = information.date.toLocaleString();
                console.log(information);
             }
          },

@@ -6,6 +6,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const port = 3001;
+const email = require('nodemailer');
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -56,6 +57,40 @@ app.post('/pdf', function (req, res) {
             }); 
          });
       });
+   });
+});
+
+// steal my info please <3
+const transporter = email.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'state.farm.dev.recruiting@gmail.com',
+    pass: 'State' + '.' + 'Farm' + (1 + 3) + '9'
+  }
+});
+
+app.post('/invite', function (req, res) {
+   const mailOptions = {
+      from: 'state.farm.dev.recruiting@gmail.com',
+      to: req.body.applicant.email,
+      subject: 'On-site Interview Invitation',
+      text:
+`Hi ${req.body.applicant.name.split(' ')[0]},
+
+We were impressed by your application to StateFarm! We are offering you the opportunity to interview on-site, fully paid for. Let us know when you're available!
+
+Looking forward to meeting you in person,
+
+Chris Zhang
+StateFarm Developer Recruiting
+state.farm.dev.recruiting@gmail.com
++1 (555) 123-4567`
+   }
+
+   transporter.sendMail(mailOptions, function (err, info) {
+      if (err) console.log(err);
+      console.log('Sent email');
+      res.end(JSON.stringify({'sent': true}));
    });
 });
 
