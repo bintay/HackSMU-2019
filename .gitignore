@@ -1,4 +1,5 @@
 *.DS_Store
+fileserver/public/uploads/*
 
 # Logs
 logs
