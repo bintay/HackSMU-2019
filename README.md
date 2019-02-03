@@ -29,6 +29,10 @@ Another challenge we had was getting video from the browser. We ended up using R
 
 ## Accomplishments that we're proud of
 
+We are proud of making a coherent webapp that makes the interview process easier for both applicants and recruiters. With a system that can screen out applicants that can't solve a technical challenge while also providing videos that give a glimpse into their personality.
+
+We are happy with our product and hope StateFarm feels the same way.
+
 ## What we learned
 
 This was our first project using VueJS, and we learned a ton about how to use the framework. It seems like a flexible, easy to use framework that we plan on using in the future.
@@ -43,4 +47,4 @@ It would also be interesting to experiment with a larger amount of data to see t
 
 ## Built With
 
-NodeJS, ExpressJS, MongoDB, VueJS, LaTeX, nodemailer, RecordRTC, jQuery, Bulma, Font Awesome, CodeMirror, JavaScript, ES6, SASS, CSS, HTML, Python, Pandas, NumPy, Bukeh
+NodeJS, ExpressJS, MongoDB, Mongoose, RESTful APIs, VueJS, LaTeX, nodemailer, RecordRTC, jQuery, Bulma, Font Awesome, CodeMirror, JavaScript, ES6, SASS, CSS, HTML, Python, Pandas, NumPy, Bukeh
