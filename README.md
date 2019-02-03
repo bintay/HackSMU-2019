@@ -18,7 +18,13 @@ From the recruiter end, the recruiter is presented with a list of applicants ord
 
 The front end is built on VueJS and Bulma with Ajax requests to fetch applicant data from the database. We use RecordRTC to record the user using the camera and microphone over the browser. The technical challenge syntax highlighting was built with CodeMirror. On the backend, we are using NodeJS, ExpressJS, and MongoDB. We use LaTeX to generate the application report PDF and nodemailer to send the email inviting the user to an interview.
 
-@bintay Built the frontend, file server, PDF generator, email invitation service, and routing. @gaiscioch Built the database, applicant API, and worked on ML. @ium0002 Worked on resume scraping with python and natural language processing before having to leave early. @wdeng112 Worked on data visualization and machine learning to predict an applicants interview status.
+@bintay Built the frontend, file server, PDF generator, email invitation service, and routing. 
+
+@gaiscioch Built the database, applicant API, and worked on ML. 
+
+@ium0002 Worked on resume scraping with python and natural language processing before having to leave early. 
+
+@wdeng112 Worked on data visualization and machine learning to predict an applicants interview status.
 
 ## Challenges we ran into
 
