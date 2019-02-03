@@ -1,5 +1,7 @@
 # HackSMU-2019
 
+Video demo and screenshots at https://devpost.com/software/devapps
+
 ## Inspiration
 
 A combination of StateFarm's problem statement and our experiences with inconvenient, cold application systems prompted us to develop an application to streamline job applications.
