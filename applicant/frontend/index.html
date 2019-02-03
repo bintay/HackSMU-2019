@@ -2,7 +2,7 @@
 <html>
 <head>
    <title>StateFarm Application</title>
-   <link type='text/css' rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css' />
+   <link type='text/css' rel='stylesheet' href='/public/bulma/mybulma.css' />
    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
    <link type='text/css' rel='stylesheet' href='/public/codemirror/lib/codemirror.css' />
    <link type='text/css' rel='stylesheet' href='/public/codemirror/monokai.css' />
@@ -13,8 +13,9 @@
    <section id='app'>
       <section class='hero-body'>
          <div class='container has-text-centered'>
-            <h1 class='title'>StateFarm Application</h1>
-            <h2 class='subtitle'>Like a good neighbor</h2>
+            <img class='big-image' src='/public/images/state_farm_logo.svg' />
+            <!-- <h1 class='title'>StateFarm Application</h1> -->
+            <h2 class='subtitle'>Developer Applications // Your career starts here</h2>
          </div>
       </section>
       <section class='section' v-if='landingPageActive'>
@@ -42,8 +43,8 @@
                   <div class='field is-horizontal'>
                      <div class='field-label is-normal'></div>
                      <div class='field-body'>
-                        <p class='help is-danger form-error' v-if='input[0] == "Email" && invalidEmail'>This email is invalid<br></p>
-                        <p class='help is-danger form-error' v-if='input[0] != "Email" && blank[input[0].toLowerCase().replace(/\W/g, "-")]'>Don't leave anything blank!</p>
+                        <p class='help is-primary form-error' v-if='input[0] == "Email" && invalidEmail'>This email is invalid<br></p>
+                        <p class='help is-primary form-error' v-if='input[0] != "Email" && blank[input[0].toLowerCase().replace(/\W/g, "-")]'>Don't leave anything blank!</p>
                      </div>
                   </div>
                </div>
@@ -65,7 +66,7 @@
                   <br>
                </div>
                <div v-if='!loadedPreview'>
-                  <a class='button is-primary' @click='startWebcamPreview'>Load Webcam Preview</a>
+                  <a class='button is-primary is-fullwidth' @click='startWebcamPreview'>Load Webcam Preview</a>
                </div>
                <video id='webcam' autoplay='true'></video>
             </div>
@@ -126,7 +127,7 @@
             <p class='title'> {{ question.number }}. {{ question.text }}</p>
             <p>Take some time to collect your thoughts. <br> Make sure we have permission to use the camera and microphone. <br>Click record when you're ready.</p>
             <br>
-            <a class='button is-danger is-fullwidth' @click='record'><i class='fas fa-video'></i>&nbsp;&nbsp;Record</a>
+            <a class='button is-primary is-fullwidth' @click='record'><i class='fas fa-video'></i>&nbsp;&nbsp;Record</a>
          </div>`
       });
 
@@ -204,11 +205,11 @@
                      if (name == 'email') {
                         let validEmail = validateEmail(element.value);
                         if (!validEmail) {
-                           element.classList.add('is-danger');
+                           element.classList.add('is-primary');
                            this.invalidEmail = true;
                            valid = false;
                         } else {
-                           element.classList.remove('is-danger');
+                           element.classList.remove('is-primary');
                            this.invalidEmail = false;
                         }
                      }
@@ -217,12 +218,12 @@
                         if (element.value.length == 0) {
                            this.blank[element.name] = true;
                            Vue.set(this.blank, element.name, true);
-                           element.classList.add('is-danger');
+                           element.classList.add('is-primary');
                            valid = false;
                         } else {
                            this.blank[element.name] = false;
                            Vue.set(this.blank, element.name, false);
-                           element.classList.remove('is-danger');
+                           element.classList.remove('is-primary');
                         }
                      }
                   }
@@ -251,10 +252,10 @@
                if (name == 'email') {
                   let validEmail = validateEmail(element.value);
                   if (!validEmail) {
-                     element.classList.add('is-danger');
+                     element.classList.add('is-primary');
                      this.invalidEmail = true;
                   } else {
-                     element.classList.remove('is-danger');
+                     element.classList.remove('is-primary');
                      this.invalidEmail = false;
                   }
                }
@@ -263,11 +264,11 @@
                   if (element.value.length == 0) {
                      this.blank[element.name] = true;
                      Vue.set(this.blank, element.name, true);
-                     element.classList.add('is-danger');
+                     element.classList.add('is-primary');
                   } else {
                      this.blank[element.name] = false;
                      Vue.set(this.blank, element.name, false);
-                     element.classList.remove('is-danger');
+                     element.classList.remove('is-primary');
                   }
                }
             },
@@ -276,7 +277,7 @@
                let name = element.name;
 
                if (name == 'email') {
-                  element.classList.remove('is-danger');
+                  element.classList.remove('is-primary');
                   this.invalidEmail = false;
                }
 
@@ -284,7 +285,7 @@
                   if (element.value.length != 0) {
                      this.blank[element.name] = false;
                      Vue.set(this.blank, element.name, false);
-                     element.classList.remove('is-danger');
+                     element.classList.remove('is-primary');
                   }
                }
             },
@@ -301,6 +302,7 @@
                      recorder = RecordRTC(stream, {
                         type: 'video'
                      });
+                     $('body, html').animate({scrollTop: 500}, 1200);
                      recorder.startRecording();
                      e.target.innerHTML = `<i class='fas fa-stop'></i>&nbsp;&nbsp;Stop`
                   });
@@ -402,6 +404,7 @@
                      }
                      vueThis.codeLoading = false;
                      vueThis.codeError += `${testCasesPass} / ${testCases.length} test cases pass.`
+                     $('body,html').animate({scrollTop: 500}, 800); 
                   }, 10);
                }
             },
