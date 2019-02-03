@@ -39,10 +39,6 @@ app.post('/pdf', function (req, res) {
                  .replace('{RATING4}', req.body.applicant.code_rating)
                  .replace('{TIME}', req.body.applicant.code_time)
                  .replace('{FLAGGED}', req.body.applicant.flagged ? 'Yes' : 'No')
-                 .replace('{STARS1}', '⭐️'.repeat(req.body.applicant.video_rating1))
-                 .replace('{STARS2}', '⭐️'.repeat(req.body.applicant.video_rating2))
-                 .replace('{STARS3}', '⭐️'.repeat(req.body.applicant.video_rating3))
-                 .replace('{STARS4}', '⭐️'.repeat(req.body.applicant.code_rating))
       console.log('read');
       fs.writeFile(`public/pdf/${filename}.tex`, data, function (err) {
          if (err) console.log(err);
@@ -54,6 +50,7 @@ app.post('/pdf', function (req, res) {
                if (err) console.log(err);
                console.log('rename');
                res.end(JSON.stringify({'file': `/public/pdf/${filename}.pdf`}));
+               exec()
             }); 
          });
       });
