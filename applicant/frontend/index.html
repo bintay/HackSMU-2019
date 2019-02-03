@@ -77,6 +77,7 @@
             <p class="title">Nice job on that question! 
             {{ ((questions.length - questionNumber - 1 == 0) ? 'No more ' : ('Just ' + (questions.length - questionNumber - 1))) }} 
             video question{{questions.length - questionNumber - 1 == 1 ? '' : 's'}} left!</p>
+            <p class="title" v-if='questions.length - questionNumber - 1 == 0'>The next question is an algorithmic challenge - time will start as soon as you continue<br><br>Feel free to take a quick break</p>
             <a class='button is-primary' @click='nextQuestion'>Keep going!</a>
          </div>
       </section>

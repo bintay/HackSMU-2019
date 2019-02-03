@@ -27,9 +27,10 @@
             <table class='table is-fullwidth'>
                <thead>
                   <th>Name</th>
-                  <th>Flagged as Hire</th>
+                  <th>Preliminary Flag as Hire</th>
                   <th>Time for Code Challenge</th>
                   <th>Reviewed</th>
+                  <th>Score</th>
                </thead>
                <tbody>
                      <tr v-for='applicant in applicants.sort(applicantsSorting)' @click='judgeApplicant(applicant)' class='applicantListing'>
@@ -39,6 +40,8 @@
                         <td>{{ (Math.floor(applicant.code_time / 60 / 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 / 60) }}:{{ (Math.floor(applicant.code_time / 60 % 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 % 60) }}:{{ (Math.floor(applicant.code_time % 60 % 60) < 10 ? '0' : '') + Math.floor((applicant.code_time % 60) % 60) }}</td>
                         <td v-if='applicant.judged' class='has-text-success'>Yes</td>
                         <td v-if='!applicant.judged' class='has-text-primary'>No</td>
+                        <td v-if='applicant.judged'>{{ Math.floor(100 * (0.33333 - Math.pow((applicant.code_time/9000), 2) + 1/6 * (applicant.video_rating1 / 5  + applicant.video_rating2 / 5  + applicant.video_rating3 / 5  + applicant.code_rating / 5))) }}</td>
+                        <td v-if='!applicant.judged'>N/A</td>
                      </tr>
                </tbody>
             </table>
