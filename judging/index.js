@@ -54,7 +54,6 @@ app.post('/pdf', function (req, res) {
                if (err) console.log(err);
                console.log('rename');
                res.end(JSON.stringify({'file': `/public/pdf/${filename}.pdf`}));
-               exec()
             }); 
          });
       });
