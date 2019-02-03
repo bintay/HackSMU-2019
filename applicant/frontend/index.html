@@ -3,9 +3,7 @@
 <head>
    <title>StateFarm Application</title>
    <link type='text/css' rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css' />
-   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-   <link type='text/css' rel='stylesheet' href='/public/codemirror/lib/codemirror.css' />
-   <link type='text/css' rel='stylesheet' href='/public/codemirror/monokai.css' />
+   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.3/css/solid.css' integrity='sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G' crossorigin='anonymous' />
    <link type='text/css' rel='stylesheet' href='/public/css/main.css' />
    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
 </head>
@@ -14,7 +12,7 @@
       <section class='hero-body'>
          <div class='container has-text-centered'>
             <h1 class='title'>StateFarm Application</h1>
-            <h2 class='subtitle'>Like a good neighbor</h2>
+            <h2 class='subtitle'>Like a good neigbor</h2>
          </div>
       </section>
       <section class='section' v-if='landingPageActive'>
@@ -29,7 +27,7 @@
                <div v-for='input in sec.questions'>
                   <div class='field is-horizontal'>
                      <div class='field-label is-normal'>
-                        <label class='label' :for='input[0].toLowerCase().replace(/\W/g, "-")'>{{ input[0] }}</label>
+                        <label class='label' :for='input[0].toLowerCase().replace(/\W/g, '-')'>{{ input[0] }}</label>
                      </div>
                      <div class='field-body'>
                         <div class='field'>
@@ -59,107 +57,40 @@
             <question-video :question='questions[questionNumber]' :record='record'>
                
             </question-video>
-            <div class='box'>
-               <div v-if='loadedPreview'>
-                  <p class="title">Looking good!</p>
-                  <br>
-               </div>
-               <div v-if='!loadedPreview'>
-                  <a class='button is-primary' @click='startWebcamPreview'>Load Webcam Preview</a>
-               </div>
-               <video id='webcam' autoplay='true'></video>
-            </div>
-         </div>
-      </section>
-      <section class='section' v-if='nextQuestionActive'>
-         <div class='container has-text-centered'>
-            <p class="title">Nice job on that question! 
-            {{ ((questions.length - questionNumber - 1 == 0) ? 'No more ' : ('Just ' + (questions.length - questionNumber - 1))) }} 
-            video question{{questions.length - questionNumber - 1 == 1 ? '' : 's'}} left!</p>
-            <a class='button is-primary' @click='nextQuestion'>Keep going!</a>
-         </div>
-      </section>
-      <section class='section' v-if='algorithmQuestionActive'>
-         <div class='container'>
-            <p class='title'>Programming Challenge</p>
-            <p class='subtitle'>Description</p>
-            <p>Jake, an emplyee at StateFarm, really likes wearing khakis. He is going on a business trip later this month, and wants to bring the best wardrobe he can. Unfortunetly, because Jake has 78321863 pairs of kahkis, he cannot fit all of them in his bag. Some khakis are worth more than others, and some are bigger than others. Given an array containing the weight information and value of each of Jake's khakis, what is the most valuable wardrobe Jake can bring? Note: If Jake can only take part of a pair of khakis, he would have to rip it, giving it negative worth, so he avoids taking partial khakis.</p>
-            <br>
-            <p class='subtitle'>Inputs</p>
-            <p>
-               <code>khakis</code> &nbsp;&nbsp;-&nbsp;&nbsp; an array of information about <code>n</code> pairs of khakis. Each element is a pair <code>[v, s]</code> where <code>v</code> is the value of the pair of khakis and <code>s</code> is the size of the khakis<br>
-               <code>size</code> &nbsp;&nbsp;-&nbsp;&nbsp; a number representing the size of Jake's suitcase.
-            </p>
-            <br>
-            <p class='subtitle'>Output</p>
-            <p>
-               The maximum value Jake can take in his suitcase without overflowing or taking partial khakis.<br><br>
-            </p>
-            <div id='editor' class='box' style='background: #272822;'></div>
-            <a v-if='!codeLoading' class='button is-fullwidth' style='background: #272822; color: #f4f4f4;' @click='testCode'>Submit</a>
-            <a v-if='codeLoading' class='button is-fullwidth is-loading' style='background: #272822; color: #f4f4f4;'>Loading</a>
-            <br>
-            <div class='box' v-if='codeError'><span v-for='line in codeError.split("\n")'>{{ line }}<br></span></div class='box'>
-            <a v-if='showGoToSubmit' class='button is-fullwidth is-primary' @click='goToFinalStep'>Apply to StateFarm</a>
-         </div>
-      </section>
-      <section class='section' v-if='successActive'>
-         <div class='container has-text-centered'>
-            <p class='title'>Awesome! Jake is extremely grateful for your help. Now he knows exactly which khakis to bring.</p>
-            <a class='button is-primary'>Submit my application!</a>
+            <video id='webcam' class='box' autoplay='true'></video>
          </div>
       </section>
    </section>
 
    <script src='https://cdn.WebRTC-Experiment.com/RecordRTC.js'></script>
-   <script
-  src="https://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
-   <script src='/public/codemirror/lib/codemirror.js'></script>
-   <script src='/public/codemirror/javascript.js'></script>
    <script>
       Vue.component('question-video', {
          props: ['question', 'record'],
          template: `
          <div class='box'>
             <p class='title'> {{ question.text }}</p>
-            <p>Take some time to collect your thoughts. <br> Make sure we have permission to use the camera and microphone. <br>Click record when you're ready.</p>
+            <p>Take some time to collect your thoughts. <br><br> Make sure we have permission to use the camera and microphone. <br><br> Click record when you're ready.</p>
             <br>
-            <a class='button is-danger is-fullwidth' @click='record'><i class='fas fa-video'></i>&nbsp;&nbsp;Record</a>
+            <br>
+            <a class='button is-danger is-fullwidth' @click='record'> Record</a>
          </div>`
       });
 
       let recorder;
       let recording = false;
-      let information = {
-         responses: []
-      };
-      let editor;
 
       const app = new Vue({
          el: '#app',
          data: {
             landingPageActive: false,
             applicantInfoActive: false,
-            videoQuestionsActive: false,
-            nextQuestionActive: true,
-            algorithmQuestionActive: false,
-            successActive: false,
-            showGoToSubmit: false,
-            codeError: '',
-            questionNumber: 2,
+            videoQuestionsActive: true,
+            questionNumber: 0,
             invalidEmail: false,
             recording: false,
-            loadedPreview: false,
-            codeLoading: false,
             blank: {'phone': false, 'full-name': false, 'email': false, 'address': false, 'postal-code': false, 'city': false, 'country': false, 'state': false},
             questions: [{
                text: 'What can you offer us that someone else cannot?',
-               type: 'video'
-            },
-            {
-               text: 'What gets you up in the morning?',
                type: 'video'
             }],
             applicantInfo: [{
@@ -222,19 +153,21 @@
                }
 
                if (valid) {
-                  for (let box of this.applicantInfo) {
-                     for (let question of box.questions) {
-                        let element = document.querySelector(`input[name=${question[0].toLowerCase().replace(/\W/g, '-')}]`);
-                        let name = element.name;
-                        let db = {
-                           'full-name': 'name',
-                           'postal-code': 'zip'
-                        }
-                        information[db[name] || name] = element.value;
-                     }
-                  }
                   this.applicantInfoActive = false;
                   this.videoQuestionsActive = true;
+                  
+                  // preview webcam
+                  let video = document.querySelector('#webcam');
+ 
+                  if (navigator.mediaDevices.getUserMedia) {       
+                      navigator.mediaDevices.getUserMedia({video: true})
+                    .then(function(stream) {
+                      video.srcObject = stream;
+                    })
+                    .catch(function(err0r) {
+                      console.log('Something went wrong!');
+                    });
+                  }
                }
             },
             validateBlur: function (e) {
@@ -282,9 +215,6 @@
                }
             },
             record: function (e) {
-               if (!this.loadedPreview) {
-                  this.startWebcamPreview();
-               }
                if (!recording) {
                   navigator.mediaDevices.getUserMedia({
                       video: true,
@@ -295,106 +225,14 @@
                         type: 'video'
                      });
                      recorder.startRecording();
-                     e.target.innerHTML = `<i class='fas fa-stop'></i>&nbsp;&nbsp;Stop`
                   });
                } else {
-                  let vueThis = this;
                   recorder.stopRecording(function() {
                      recording = false;
                      let blob = recorder.getBlob();
-                     //invokeSaveAsDialog(blob);
-                     var fd = new FormData();
-                     fd.append('data', blob);
-                     $.ajax({
-                        type: 'POST',
-                        url: 'http://localhost:12345/video/',
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                     }).done(function(data) {
-                        data = JSON.parse(data);
-                        information.responses[vueThis.questionNumber] = data.filename;
-                        vueThis.videoQuestionsActive = false;
-                        vueThis.nextQuestionActive = true;
-                        vueThis.loadedPreview = false;
-                     });
-                     $('.mic').css('display', 'inline');
-                     $('.stop').css('display', 'none');
-                     e.target.innerHTML = `<i class='fas fa-video'></i>&nbsp;&nbsp;Record`
+                     invokeSaveAsDialog(blob);
                   });
                }
-            },
-            startWebcamPreview: function () {
-               // preview webcam
-               let webcam = document.querySelector('#webcam');
-               this.loadedPreview = true;
-               if (navigator.mediaDevices.getUserMedia) {       
-                   navigator.mediaDevices.getUserMedia({video: true})
-                 .then(function(stream) {
-                   webcam.srcObject = stream;
-                 })
-                 .catch(function(err) {
-                   console.log('Something went wrong!');
-                   console.log(err);
-                 });
-               }
-            },
-            nextQuestion: function () {
-               if (this.questionNumber + 1 < this.questions.length) { 
-                  ++this.questionNumber;
-                  this.nextQuestionActive = false;
-                  this.videoQuestionsActive = true;
-               } else {
-                  this.nextQuestionActive = false;
-                  this.algorithmQuestionActive = true;
-                  setTimeout(() => {
-                     editor = CodeMirror(document.querySelector('#editor'), {
-                        value: 'function helpJake (khakis, size) {\n  return 0;\n}\n',
-                        mode: 'javascript',
-                        theme: 'monokai',
-                        lineNumbers: true,
-                        styleActiveLine: true,
-                        matchBrackets: true
-                     });
-                  }, 20);
-               }
-            },
-            testCode: function () {
-               this.codeError = '';
-               let code = editor.getValue();
-               let testCases = [
-                  [[[8, 1], [4, 2], [0, 3], [5, 2], [3, 2]], 4, 13],
-                  [[[1, 2], [2, 3], [5, 3], [9, 4], [4, 6]], 10, 16],
-                  [[[135, 70], [139, 73], [149, 77], [150, 80], [156,82], [163,87], [173,90], [184,94], [192,98], [201,106], [210,110], [214,113], [221,115], [229,118], [240,120]], 750, 1458]
-               ];
-               let testCasesPass = 0;
-               eval(code);
-               if (!helpJake) {
-                  this.codeError = 'Error: Method `helpJake` not found.';
-               } else {
-                  let vueThis = this;
-                  vueThis.codeLoading = true;
-                  setTimeout(() => {
-                     for (let i = 0; i < testCases.length; ++i) {
-                        if (helpJake(testCases[i][0], testCases[i][1]) != testCases[i][2]) {
-                           vueThis.codeError += `Test case ${i + 1} failed: Incorrect output.\n`;
-                        } else {
-                           vueThis.codeError += `Test case ${i + 1} passed\n`;
-                           ++testCasesPass;
-                        }
-                     }
-
-                     if (testCasesPass == testCases.length) {
-                        vueThis.showGoToSubmit = true;
-                     }
-                     vueThis.codeLoading = false;
-                     vueThis.codeError += `${testCasesPass} / ${testCases.length} test cases pass.`
-                  }, 10);
-               }
-            },
-            goToFinalStep: function () {
-               this.algorithmQuestionActive = false;
-               this.successActive = true;
             }
          },
          created: function () {
