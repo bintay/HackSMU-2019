@@ -109,16 +109,19 @@
             <div id='editor' class='box' style='background: #272822;'></div>
             <textarea name='comments4' class='textarea' placeholder='Add comments...' v-model='currentApplicant.code_comments'></textarea>
             <br>
-            <star-rating :rating='currentApplicant.code_rating' active-color='#DA3831' @rating-selected='setRating3'></star-rating>
+            <star-rating :rating='currentApplicant.code_rating' active-color='#DA3831' @rating-selected='setRatingC'></star-rating>
          </div>
+         <a class='button is-primary is-fullwidth' @click='generateReport' v-if='!pdfLoading'>Generate PDF Report</a>
+         <a class='button is-primary is-fullwidth is-loading' @click='generateReport' v-if='pdfLoading'>Loading</a>
+         <br>
          <a class='button is-primary is-fullwidth' @click='backToList'>Save Application Review</a>
       </section>
    </section>
 
-   <!-- <script
-  src='https://code.jquery.com/jquery-3.3.1.min.js'
-  integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8='
-  crossorigin='anonymous'></script> -->
+   <script
+      src='https://code.jquery.com/jquery-3.3.1.min.js'
+      integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8='
+      crossorigin='anonymous'></script>
    <script src='http://localhost:3000/public/codemirror/lib/codemirror.js'></script>
    <script src='http://localhost:3000/public/codemirror/javascript.js'></script>
    <script src='http://localhost:3000/public/js/vue-star.js'></script>
@@ -138,6 +141,7 @@
             loaded: false,
             listActive: true,
             judgeActive: false,
+            pdfLoading: false,
             currentApplicant: {
                name: '',
                email: '',
@@ -199,6 +203,17 @@
             },
             setRatingC: function (rating) {
                this.currentApplicant.code_rating = rating;
+            },
+            generateReport: function () {
+               this.pdfLoading = true;
+               let vueThis = this;
+               $.post('http://localhost:3001/pdf', {
+                  applicant: this.currentApplicant
+               }).done(function (data) {
+                  data = JSON.parse(data);
+                  vueThis.pdfLoading = false;
+                  window.open(`http://localhost:3001${data.file}`, '_blank');
+               });
             }
          },
          created: function () {
