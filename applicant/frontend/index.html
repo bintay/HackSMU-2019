@@ -82,9 +82,9 @@
       </section>
       <section class='section' v-if='algorithmQuestionActive'>
          <div class='container'>
-            <p class='title'>Programming Challenge</p>
+            <p class='title'>Programming Challenge<span class='text-right'>Time taken: {{ (Math.floor(this.timeTaken / 60 / 60) < 10 ? '0' : '') + Math.floor(this.timeTaken / 60 / 60) }}:{{ (Math.floor(this.timeTaken / 60 % 60) < 10 ? '0' : '') + Math.floor(this.timeTaken / 60 % 60) }}:{{ (Math.floor(this.timeTaken % 60 % 60) < 10 ? '0' : '') + Math.floor((this.timeTaken % 60) % 60) }}</span></p>
             <p class='subtitle'>Description</p>
-            <p>Jake, an employee at StateFarm, really likes wearing khakis. He is going on a business trip later this month, and wants to bring the best wardrobe he can. Unfortunately, because Jake from StateFarm has 78321863 pairs of khakis, he cannot fit all of them in his bag. Some khakis are worth more than others, and some are bigger than others. Given an array containing the weight information and value of each of Jake's khakis, what is the most valuable wardrobe Jake can bring? Note: If Jake can only take part of a pair of khakis, he would have to rip it, giving it negative worth, so he avoids taking partial khakis.</p>
+            <p>Jake, an employee at StateFarm, really likes wearing khakis. He is going on a business trip later this month, and wants to bring the best wardrobe he can. Unfortunately, because Jake from StateFarm has 78321863 pairs of khakis, Jake from StateFarm cannot fit all of them in his bag. Some khakis are worth more than others, and some are bigger than others. Given an array containing the weight information and value of each of Jake (from StateFarm)'s khakis, what is the most valuable wardrobe Jake from StateFarm can bring? Note: If Jake from StateFarm can only take part of a pair of khakis, he would have to rip it, then he would be arrested for not wearing pants, so he avoids taking partial khakis.</p>
             <br>
             <p class='subtitle'>Inputs</p>
             <p>
@@ -94,11 +94,16 @@
             <br>
             <p class='subtitle'>Output</p>
             <p>
-               The maximum value Jake can take in his suitcase without overflowing or taking partial khakis.<br><br>
+               The maximum value Jake can take in his suitcase without overflowing or taking partial khakis.
+            </p>
+            <br>
+            <p class='subtitle'>Note</p>
+            <p>
+               Code style matters! Use comments when needed, and use acceptable formating.<br><br>
             </p>
             <div id='editor' class='box' style='background: #272822;'></div>
-            <a v-if='!codeLoading' class='button is-fullwidth' style='background: #272822; color: #f4f4f4;' @click='testCode'>Submit</a>
-            <a v-if='codeLoading' class='button is-fullwidth is-loading' style='background: #272822; color: #f4f4f4;'>Loading</a>
+            <a v-if='!codeLoading && showCodeSubmit' class='button is-fullwidth' style='background: #272822; color: #f4f4f4;' @click='testCode'>Submit</a>
+            <a v-if='codeLoading && showCodeSubmit' class='button is-fullwidth is-loading' style='background: #272822; color: #f4f4f4;'>Loading</a>
             <br>
             <div class='box' v-if='codeError'><span v-for='line in codeError.split("\n")'>{{ line }}<br></span></div class='box'>
             <a v-if='showGoToSubmit' class='button is-fullwidth is-primary' @click='goToFinalStep'>Apply to StateFarm</a>
@@ -107,7 +112,7 @@
       <section class='section' v-if='successActive'>
          <div class='container has-text-centered'>
             <p class='title'>Awesome! Jake is extremely grateful for your help. Now he knows exactly which khakis to bring.</p>
-            <a class='button is-primary'>Submit my application!</a>
+            <a class='button is-primary' @click='submitApplication'>Submit my application!</a>
          </div>
       </section>
    </section>
@@ -137,13 +142,14 @@
          responses: []
       };
       let editor;
+      let updateInterval;
 
       const app = new Vue({
          el: '#app',
          data: {
-            landingPageActive: false,
+            landingPageActive: true,
             applicantInfoActive: false,
-            videoQuestionsActive: true,
+            videoQuestionsActive: false,
             nextQuestionActive: false,
             algorithmQuestionActive: false,
             successActive: false,
@@ -154,14 +160,17 @@
             recording: false,
             loadedPreview: false,
             codeLoading: false,
+            codeStartTime: 0,
+            timeTaken: 0,
+            showCodeSubmit: true,
             blank: {'phone': false, 'full-name': false, 'email': false, 'address': false, 'postal-code': false, 'city': false, 'country': false, 'state': false},
             questions: [{
-               text: 'What can you offer us that someone else cannot?',
+               text: 'What can you offer us that someone else cannot? Why do you want to bring these skills to StateFarm?',
                type: 'video',
                number: 1
             },
             {
-               text: 'What gets you up in the morning?',
+               text: 'Give a time when you went above and beyond the requirements for a project.',
                type: 'video',
                number: 2
             },
@@ -188,6 +197,9 @@
                   ['State', 'Texas']
                ]
             }]
+         },
+         computed: {
+
          },
          methods: {
             startProcess: function () {
@@ -356,6 +368,11 @@
                } else {
                   this.nextQuestionActive = false;
                   this.algorithmQuestionActive = true;
+                  this.codeStartTime = new Date();
+                  updateInterval = setInterval(() => {
+                     this.timeTaken = (new Date() - this.codeStartTime) / 1000;
+                  }, 1000);
+
                   setTimeout(() => {
                      editor = CodeMirror(document.querySelector('#editor'), {
                         value: 'function helpJake (khakis, size) {\n  return 0;\n}\n',
@@ -401,6 +418,10 @@
 
                      if (testCasesPass == testCases.length) {
                         vueThis.showGoToSubmit = true;
+                        clearInterval(updateInterval);
+                        information.code_time = this.timeTaken;
+                        information.code = code;
+                        vueThis.showCodeSubmit = false;
                      }
                      vueThis.codeLoading = false;
                      vueThis.codeError += `${testCasesPass} / ${testCases.length} test cases pass.`
@@ -411,6 +432,9 @@
             goToFinalStep: function () {
                this.algorithmQuestionActive = false;
                this.successActive = true;
+            },
+            submitApplication: function () {
+               console.log(information);
             }
          },
          created: function () {
