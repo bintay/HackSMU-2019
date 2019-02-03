@@ -37,7 +37,7 @@ We are happy with our product and hope StateFarm feels the same way.
 
 This was our first project using VueJS, and we learned a ton about how to use the framework. It seems like a flexible, easy to use framework that we plan on using in the future.
 
-We also learned how to delegate different parts of large projects in order to develop more complex applications quickly. With an application of this scale, it was crutial for us to work together and commuincate to define a standard interface for communication across the components and a uniform design.
+We also learned how to delegate different parts of large projects in order to develop more complex applications quickly. With an application of this scale, it was crucial for us to work together and commuincate to define a standard interface for communication across the components and a uniform design.
 
 ## What's next
 
@@ -47,4 +47,4 @@ It would also be interesting to experiment with a larger amount of data to see t
 
 ## Built With
 
-NodeJS, ExpressJS, MongoDB, Mongoose, RESTful APIs, VueJS, LaTeX, nodemailer, RecordRTC, jQuery, Bulma, Font Awesome, CodeMirror, JavaScript, ES6, SASS, CSS, HTML, Python, Pandas, NumPy, Bukeh
+JavaScript, ES6, ExpressJS, NodeJS, nodemailer, VueJS, jQuery, RecordRTC, Code Mirror, Latex, Python, numpy, Pandas, Bokeh, CSS, SASS, Bulma, Font Awesome, HTML, LaTeX, MongoDB, Mongoose, RESTful APIs
