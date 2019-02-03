@@ -36,7 +36,7 @@
                         <td>{{ applicant.name }}</td>
                         <td v-if='applicant.flagged' class='has-text-success'>Yes</td>
                         <td v-if='!applicant.flagged' class='has-text-primary'>No</td>
-                        <td>{{ (Math.floor(applicant.code_time / 60 / 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 / 60) }}:{{ (Math.floor(applicant.code_time / 60 % 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 % 60) }}:{{ (applicant.code_time % 60 % 60 < 10 ? '0' : '') + (applicant.code_time % 60) % 60 }}</td>
+                        <td>{{ (Math.floor(applicant.code_time / 60 / 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 / 60) }}:{{ (Math.floor(applicant.code_time / 60 % 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 % 60) }}:{{ (Math.floor(applicant.code_time % 60 % 60) < 10 ? '0' : '') + Math.floor((applicant.code_time % 60) % 60) }}</td>
                         <td v-if='applicant.judged' class='has-text-success'>Yes</td>
                         <td v-if='!applicant.judged' class='has-text-primary'>No</td>
                      </tr>
@@ -131,8 +131,6 @@
    <script src='http://localhost:3000/public/codemirror/javascript.js'></script>
    <script src='http://localhost:3000/public/js/vue-star.js'></script>
    <script>
-      
-
       let recorder;
       let recording = false;
       let information = {
@@ -164,7 +162,8 @@
                code: '',
                code_time: 0,
                flagged: false,
-               judged: false
+               judged: false,
+               _id: ''
             },
             applicants: []
          },
@@ -189,6 +188,9 @@
                this.currentApplicant.judged = true;
                this.listActive = true;
                this.judgeActive = false;
+               $.post('http://3.80.8.209:3000/update/' + this.currentApplicant._id, this.currentApplicant).done(function (data) {
+                  console.log(data);
+               });
             },
             applicantsSorting: function (a, b) {
                if (a.judged && !b.judged) return 1;
@@ -236,59 +238,63 @@
          },
          created: function () {
             let vueThis = this;
-            setTimeout(() => {
-               vueThis.applicants = [{
-                  name: 'Jake from StateFarm',
-                  email: 'jake@statefarm.com',
-                  phone: '(855) 733-7333',
-                  address: '773 Piper Street',
-                  zip: '45040',
-                  city: 'Mason',
-                  country: 'USA',
-                  state: 'OH',
-                  video_url1: 'http://localhost:12345/public/uploads/dcf36fecd6edbda1030d56addfa7164a',
-                  video_url2: 'http://localhost:12345/public/uploads/7b8e7613dbe13f961b30c6bc9a327550',
-                  video_url3: 'http://localhost:12345/public/uploads/3f4eafeb5b0dbe991a09e00673a76007',
-                  code: 'function helpJake (a, b) {\n  return "lol no"\n}\n',
-                  code_time: 4534,
-                  flagged: false,
-                  judged: false,
-                  video_comments1: '',
-                  video_comments2: '',
-                  video_comments3: '',
-                  code_comments: '',
-                  video_rating1: 0,
-                  video_rating2: 0,
-                  video_rating3: 0,
-                  code_rating: 0
-               },
-               {
-                  name: 'Ben Taylor',
-                  email: 'bentaylor@bentaylor.me',
-                  phone: '(555) 321-7638',
-                  address: '312 Address Drive',
-                  zip: '89133',
-                  city: 'Sans Mario',
-                  country: 'USA',
-                  state: 'CA',
-                  video_url1: 'http://localhost:12345/public/uploads/dcf36fecd6edbda1030d56addfa7164a',
-                  video_url2: 'http://localhost:12345/public/uploads/7b8e7613dbe13f961b30c6bc9a327550',
-                  video_url3: 'http://localhost:12345/public/uploads/3f4eafeb5b0dbe991a09e00673a76007',
-                  code: 'function helpJake (a, b) {\n  return "lol okay"\n}\n',
-                  code_time: 1234,
-                  flagged: true,
-                  judged: false,
-                  video_comments1: '',
-                  video_comments2: '',
-                  video_comments3: '',
-                  code_comments: '',
-                  video_rating1: 0,
-                  video_rating2: 0,
-                  video_rating3: 0,
-                  code_rating: 0
-               }];
+            $.get('http://3.80.8.209:3000/applicants', information).done(function (data) {
+               vueThis.applicants = data;
                vueThis.loaded = true;
-            }, 400);
+            });
+            // setTimeout(() => {
+            //    vueThis.applicants = [{
+            //       name: 'Jake from StateFarm',
+            //       email: 'jake@statefarm.com',
+            //       phone: '(855) 733-7333',
+            //       address: '773 Piper Street',
+            //       zip: '45040',
+            //       city: 'Mason',
+            //       country: 'USA',
+            //       state: 'OH',
+            //       video_url1: 'http://localhost:12345/public/uploads/dcf36fecd6edbda1030d56addfa7164a',
+            //       video_url2: 'http://localhost:12345/public/uploads/7b8e7613dbe13f961b30c6bc9a327550',
+            //       video_url3: 'http://localhost:12345/public/uploads/3f4eafeb5b0dbe991a09e00673a76007',
+            //       code: 'function helpJake (a, b) {\n  return "lol no"\n}\n',
+            //       code_time: 4534,
+            //       flagged: false,
+            //       judged: false,
+            //       video_comments1: '',
+            //       video_comments2: '',
+            //       video_comments3: '',
+            //       code_comments: '',
+            //       video_rating1: 0,
+            //       video_rating2: 0,
+            //       video_rating3: 0,
+            //       code_rating: 0
+            //    },
+            //    {
+            //       name: 'Ben Taylor',
+            //       email: 'bentaylor@bentaylor.me',
+            //       phone: '(555) 321-7638',
+            //       address: '312 Address Drive',
+            //       zip: '89133',
+            //       city: 'Sans Mario',
+            //       country: 'USA',
+            //       state: 'CA',
+            //       video_url1: 'http://localhost:12345/public/uploads/dcf36fecd6edbda1030d56addfa7164a',
+            //       video_url2: 'http://localhost:12345/public/uploads/7b8e7613dbe13f961b30c6bc9a327550',
+            //       video_url3: 'http://localhost:12345/public/uploads/3f4eafeb5b0dbe991a09e00673a76007',
+            //       code: 'function helpJake (a, b) {\n  return "lol okay"\n}\n',
+            //       code_time: 1234,
+            //       flagged: true,
+            //       judged: false,
+            //       video_comments1: '',
+            //       video_comments2: '',
+            //       video_comments3: '',
+            //       code_comments: '',
+            //       video_rating1: 0,
+            //       video_rating2: 0,
+            //       video_rating3: 0,
+            //       code_rating: 0
+            //    }];
+            //    vueThis.loaded = true;
+            // }, 400);
          }
       });
    </script>
