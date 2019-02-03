@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>StateFarm Application</title>
+   <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/bulma/mybulma.css' />
+   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.1/css/all.css' integrity='sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr' crossorigin='anonymous'>
+   <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/codemirror/lib/codemirror.css' />
+   <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/codemirror/monokai.css' />
+   <link type='text/css' rel='stylesheet' href='http://localhost:3000/public/css/main.css' />
+   <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+<body>
+   <section id='app'>
+      <section class='hero-body'>
+         <div class='container has-text-centered'>
+            <img class='big-image' src='http://localhost:3000/public/images/state_farm_logo.svg' />
+            <!-- <h1 class='title'>StateFarm Application</h1> -->
+            <h2 class='subtitle'>Developer Applications Judging</h2>
+         </div>
+      </section>
+      <section class='section loading' v-if='listActive && !loaded'>
+         <a class='button is-loading is-fullwidth'></a>
+      </section>
+      <section class='section applicant-list' v-if='listActive && loaded'>
+         <div class='box'>
+            <table class='table is-fullwidth'>
+               <thead>
+                  <th>Name</th>
+                  <th>Flagged as Hire</th>
+                  <th>Time for Code Challenge</th>
+                  <th>Judged</th>
+               </thead>
+               <tbody>
+                     <tr v-for='applicant in applicants.sort(applicantsSorting)' @click='judgeApplicant(applicant)' class='applicantListing'>
+                        <td>{{ applicant.name }}</td>
+                        <td v-if='applicant.flagged' class='has-text-success'>Yes</td>
+                        <td v-if='!applicant.flagged' class='has-text-primary'>No</td>
+                        <td>{{ (Math.floor(applicant.code_time / 60 / 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 / 60) }}:{{ (Math.floor(applicant.code_time / 60 % 60) < 10 ? '0' : '') + Math.floor(applicant.code_time / 60 % 60) }}:{{ (applicant.code_time % 60 % 60 < 10 ? '0' : '') + (applicant.code_time % 60) % 60 }}</td>
+                        <td v-if='applicant.judged' class='has-text-success'>Yes</td>
+                        <td v-if='!applicant.judged' class='has-text-primary'>No</td>
+                     </tr>
+               </tbody>
+            </table>
+         </div>
+      </section>
+      <section class='section judging' v-if='judgeActive'>
+         <a class='has-text-dark' @click='backToList'><i class='fas fa-arrow-left'></i>&nbsp;&nbsp;&nbsp;Back to Applicant List</a>
+         <br>
+         <br>
+         <div class='box'>
+            <p class='title'>{{ currentApplicant.name }}</p>
+            <p>
+               {{ currentApplicant.address }} <br> {{ currentApplicant.city }}, {{ currentApplicant.state }}, {{ currentApplicant.country }} {{ currentApplicant.zip }} <br><br>
+               {{ currentApplicant.phone }}<br>
+               {{ currentApplicant.email }}<br><br>
+               Flagged as Hire: <span class='has-text-success' v-if='currentApplicant.flagged'>Yes</span><span class='has-text-primary' v-if='!currentApplicant.flagged'>No</span><br>
+               Judged: <span class='has-text-success' v-if='currentApplicant.judged'>Yes</span><span class='has-text-primary' v-if='!currentApplicant.judged'>No</span><br>
+            </p>
+         </div>
+         <div class='box video-box'>
+            <p class='title'>Question 1: What can you offer us that someone else cannot? Why do you want to bring these skills to StateFarm?</p>
+            <div class='columns'>
+               <video :src='currentApplicant.video_url1' controls class='column is-one-quarter'></video>
+               <div class='column is-three-quarters'>
+                  <textarea name='comments1' class='textarea' placeholder='Add comments...' v-model='currentApplicant.video_comments1'></textarea>
+                  <br>
+                  <star-rating :rating='currentApplicant.video_rating1' active-color='#DA3831' @rating-selected='setRating1'></star-rating>
+               </div>
+            </div>
+         </div>
+         <div class='box video-box'>
+            <p class='title'>Question 2: Give a time when you went above and beyond the requirements for a project.</p>
+            <div class='columns'>
+               <video :src='currentApplicant.video_url2' controls class='column is-one-quarter'></video>
+               <div class='column is-three-quarters'>
+                  <textarea name='comments2' class='textarea' placeholder='Add comments...' v-model='currentApplicant.video_comments2'></textarea>
+                  <br>
+                  <star-rating :rating='currentApplicant.video_rating2' active-color='#DA3831' @rating-selected='setRating2'></star-rating>
+               </div>
+            </div>
+         </div>
+         <div class='box video-box'>
+            <p class='title'>Question 3: Tell me about a time when you disagreed with your boss.</p>
+            <div class='columns'>
+               <video :src='currentApplicant.video_url3' controls class='column is-one-quarter'></video>
+               <div class='column is-three-quarters'>
+                  <textarea name='comments3' class='textarea' placeholder='Add comments...' v-model='currentApplicant.video_comments3'></textarea>
+                  <br>
+                  <star-rating :rating='currentApplicant.video_rating3' active-color='#DA3831' @rating-selected='setRating3'></star-rating>
+               </div>
+            </div>
+         </div>
+         <div class='box'>
+            <p class='title'>Programming Challenge</p>
+            <p class='subtitle'>Description</p>
+            <p>Jake, an employee at StateFarm, really likes wearing khakis. He is going on a business trip later this month, and wants to bring the best wardrobe he can. Unfortunately, because Jake from StateFarm has 78321863 pairs of khakis, Jake from StateFarm cannot fit all of them in his bag. Some khakis are worth more than others, and some are bigger than others. Given an array containing the weight information and value of each of Jake (from StateFarm)'s khakis, what is the most valuable wardrobe Jake from StateFarm can bring? Note: If Jake from StateFarm can only take part of a pair of khakis, he would have to rip it, then he would be arrested for not wearing pants, so he avoids taking partial khakis.</p>
+            <br>
+            <p class='subtitle'>Inputs</p>
+            <p>
+               <code>khakis</code> &nbsp;&nbsp;-&nbsp;&nbsp; an array of information about <code>n</code> pairs of khakis. Each element is a pair <code>[v, s]</code> where <code>v</code> is the value of the pair of khakis and <code>s</code> is the size of the khakis<br>
+               <code>size</code> &nbsp;&nbsp;-&nbsp;&nbsp; a number representing the size of Jake's suitcase.
+            </p>
+            <br>
+            <p class='subtitle'>Output</p>
+            <p>
+               The maximum value Jake can take in his suitcase without overflowing or taking partial khakis.<br><br>
+            </p>
+            <p class='title'>Applicant Solution</p>
+            <div id='editor' class='box' style='background: #272822;'></div>
+            <textarea name='comments4' class='textarea' placeholder='Add comments...' v-model='currentApplicant.code_comments'></textarea>
+            <br>
+            <star-rating :rating='currentApplicant.code_rating' active-color='#DA3831' @rating-selected='setRating3'></star-rating>
+         </div>
+         <a class='button is-primary is-fullwidth' @click='backToList'>Save Application Review</a>
+      </section>
+   </section>
+
+   <!-- <script
+  src='https://code.jquery.com/jquery-3.3.1.min.js'
+  integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8='
+  crossorigin='anonymous'></script> -->
+   <script src='http://localhost:3000/public/codemirror/lib/codemirror.js'></script>
+   <script src='http://localhost:3000/public/codemirror/javascript.js'></script>
+   <script src='http://localhost:3000/public/js/vue-star.js'></script>
+   <script>
+      
+
+      let recorder;
+      let recording = false;
+      let information = {
+         responses: []
+      };
+      let editor;
+
+      const app = new Vue({
+         el: '#app',
+         data: {
+            loaded: false,
+            listActive: true,
+            judgeActive: false,
+            currentApplicant: {
+               name: '',
+               email: '',
+               phone: '',
+               address: '',
+               zip: '',
+               city: '',
+               country: '',
+               state: '',
+               video_url1: '',
+               video_url2: '',
+               video_url3: '',
+               code: '',
+               code_time: 0,
+               flagged: false,
+               judged: false
+            },
+            applicants: []
+         },
+         methods: {
+            judgeApplicant: function (applicant) {
+               this.listActive = false;
+               this.judgeActive = true;
+               this.currentApplicant = applicant;
+               setTimeout(() => {
+                  let editor = CodeMirror(document.querySelector('#editor'), {
+                     value: this.currentApplicant.code,
+                     mode: 'javascript',
+                     theme: 'monokai',
+                     lineNumbers: true,
+                     styleActiveLine: true,
+                     matchBrackets: true,
+                     readOnly: true
+                  });
+               }, 100);
+            },
+            backToList: function () {
+               this.currentApplicant.judged = true;
+               this.listActive = true;
+               this.judgeActive = false;
+            },
+            applicantsSorting: function (a, b) {
+               if (a.judged && !b.judged) return 1;
+               if (b.judged && !a.judged) return -1;
+
+               if (a.flagged && !b.flagged) return -1;
+               if (b.flagged && !a.flagged) return 1;
+
+               return a.code_time - b.code_time;
+            },
+            setRating1: function (rating) {
+               this.currentApplicant.video_rating1 = rating;
+            },
+            setRating2: function (rating) {
+               this.currentApplicant.video_rating2 = rating;
+            },
+            setRating3: function (rating) {
+               this.currentApplicant.video_rating3 = rating;
+            },
+            setRatingC: function (rating) {
+               this.currentApplicant.code_rating = rating;
+            }
+         },
+         created: function () {
+            let vueThis = this;
+            setTimeout(() => {
+               vueThis.applicants = [{
+                  name: 'Jake from StateFarm',
+                  email: 'jake@statefarm.com',
+                  phone: '(855) 733-7333',
+                  address: '773 Piper Street',
+                  zip: '45040',
+                  city: 'Mason',
+                  country: 'USA',
+                  state: 'OH',
+                  video_url1: 'http://localhost:12345/public/uploads/dcf36fecd6edbda1030d56addfa7164a',
+                  video_url2: 'http://localhost:12345/public/uploads/7b8e7613dbe13f961b30c6bc9a327550',
+                  video_url3: 'http://localhost:12345/public/uploads/3f4eafeb5b0dbe991a09e00673a76007',
+                  code: 'function helpJake (a, b) {\n  return "lol no"\n}\n',
+                  code_time: 4534,
+                  flagged: false,
+                  judged: false,
+                  video_comments1: '',
+                  video_comments2: '',
+                  video_comments3: '',
+                  code_comments: '',
+                  video_rating1: 0,
+                  video_rating2: 0,
+                  video_rating3: 0,
+                  code_rating: 0
+               },
+               {
+                  name: 'Ben Taylor',
+                  email: 'ben@example.com',
+                  phone: '(555) 321-7638',
+                  address: '312 Address Drive',
+                  zip: '89133',
+                  city: 'Sans Mario',
+                  country: 'USA',
+                  state: 'CA',
+                  video_url1: 'http://localhost:12345/public/uploads/dcf36fecd6edbda1030d56addfa7164a',
+                  video_url2: 'http://localhost:12345/public/uploads/7b8e7613dbe13f961b30c6bc9a327550',
+                  video_url3: 'http://localhost:12345/public/uploads/3f4eafeb5b0dbe991a09e00673a76007',
+                  code: 'function helpJake (a, b) {\n  return "lol okay"\n}\n',
+                  code_time: 1234,
+                  flagged: true,
+                  judged: false,
+                  video_comments1: '',
+                  video_comments2: '',
+                  video_comments3: '',
+                  code_comments: '',
+                  video_rating1: 0,
+                  video_rating2: 0,
+                  video_rating3: 0,
+                  code_rating: 0
+               }];
+               vueThis.loaded = true;
+            }, 400);
+         }
+      });
+   </script>
+</body>
+</html>
