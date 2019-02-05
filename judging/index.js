@@ -95,6 +95,31 @@ state.farm.dev.recruiting@gmail.com
    });
 });
 
+app.post('/delete', function (req, res) {
+   const mailOptions = {
+      from: 'state.farm.dev.recruiting@gmail.com',
+      to: req.body.applicant.email,
+      subject: 'StateFarm Feedback',
+      text:
+`Hi ${req.body.applicant.name.split(' ')[0]},
+
+Unfortunetly, we had a really strong applicant pool this time around and we aren't able to interview everyone in person. We hope you can find success in your job search elsewhere.
+
+Best wishes,
+
+Chris Zhang
+StateFarm Developer Recruiting
+state.farm.dev.recruiting@gmail.com
++1 (555) 123-4567`
+   }
+
+   transporter.sendMail(mailOptions, function (err, info) {
+      if (err) console.log(err);
+      console.log('Sent email');
+      res.end(JSON.stringify({'sent': true}));
+   });
+});
+
 app.listen(port, function () {
    console.log(`Listening on port ${port}`);
 });

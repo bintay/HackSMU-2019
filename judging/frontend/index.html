@@ -31,6 +31,7 @@
                   <th>Time for Code Challenge</th>
                   <th>Reviewed</th>
                   <th>Score</th>
+                  <th>Delete</th>
                </thead>
                <tbody>
                      <tr v-for='applicant in applicants.sort(applicantsSorting)' @click='judgeApplicant(applicant)' class='applicantListing'>
@@ -42,6 +43,8 @@
                         <td v-if='!applicant.judged' class='has-text-primary'>No</td>
                         <td v-if='applicant.judged'>{{ Math.floor(100 * (0.33333 - Math.pow((applicant.code_time/9000), 2) + 1/6 * (applicant.video_rating1 / 5  + applicant.video_rating2 / 5  + applicant.video_rating3 / 5  + applicant.code_rating / 5))) }}</td>
                         <td v-if='!applicant.judged'>N/A</td>
+                        <td @click='deleteApplicant(applicant)' class='has-text-danger' v-if='!loadDelete[applicant._id]'><i class='fas fa-trash'></i></td>
+                        <td @click='deleteApplicant(applicant)' class='has-text-danger is-loading' v-if='loadDelete[applicant._id]'><i class='fas fa-trash'></i></td>
                      </tr>
                </tbody>
             </table>
@@ -122,6 +125,9 @@
          <a class='button is-primary is-fullwidth is-loading' v-if='emailLoading && !sentEmail'>Loading</a>
          <a class='button is-primary is-fullwidth' v-if='sentEmail'>Invitation Sent</a>
          <br>
+         <a class='button is-primary is-fullwidth' @click='deleteApplicant(currentApplicant)' v-if='!loadDelete[currentApplicant._id]'>Send Rejection and Delete</a>
+         <a class='button is-primary is-fullwidth is-loading' v-if='loadDelete[currentApplicant._id]'>Loading</a>
+         <br>
          <a class='button is-primary is-fullwidth' @click='backToList'>Save Application Review</a>
       </section>
    </section>
@@ -145,6 +151,8 @@
          el: '#app',
          data: {
             loaded: false,
+            preventJudge: false,
+            loadDelete: {},
             listActive: true,
             judgeActive: false,
             pdfLoading: false,
@@ -172,6 +180,7 @@
          },
          methods: {
             judgeApplicant: function (applicant) {
+               if (this.preventJudge) return;
                this.listActive = false;
                this.judgeActive = true;
                this.currentApplicant = applicant;
@@ -237,6 +246,18 @@
                   vueThis.emailLoading = false;
                   vueThis.sendInvite = true;
                });
+            },
+            deleteApplicant: function (applicant) {
+               this.preventJudge = true;
+               this.loadDelete[applicant._id] = true;
+               this.$forceUpdate();
+               $.post('http://3.80.8.209:3000/delete/' + applicant._id).done(function (data) {
+                  $.post('http://localhost:3001/delete', {
+                     applicant: applicant
+                  }).done(function (data) {
+                     location.reload();
+                  });
+               });
             }
          },
          created: function () {
@@ -244,6 +265,9 @@
             $.get('http://3.80.8.209:3000/applicants', information).done(function (data) {
                vueThis.applicants = data;
                vueThis.loaded = true;
+               for (let i = 0; i < vueThis.applicants; ++i) {
+                  vueThis.loadDelete[vueThis.applicants[i]._id] = false;
+               }
             });
             // setTimeout(() => {
             //    vueThis.applicants = [{
